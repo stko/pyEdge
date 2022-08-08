@@ -1,0 +1,40 @@
+version: "3.9"
+services:
+  parent_company_rabbitmq:
+    container_name: "rabbitmq"
+    image: rabbitmq:management
+    ports:
+      # HTTP management UI
+      - '8080:15672'
+      # AMQP protocol port
+      - '5673:5672'
+    environment:
+    - RABBITMQ_DEFAULT_USER=myuser
+    - RABBITMQ_DEFAULT_PASS=mypassword
+  exchange:
+    container_name: "exchange"
+    # image: rabbitmq-management-with-federation
+    image: rabbitmq-management
+    build: ./exchange
+    #build:
+    #  context: .
+    #  dockerfile: ./Dockerfile
+    ports:
+      # HTTP management UI
+      - '8081:15672'
+      # AMQP protocol port
+      - '5672:5672'
+    environment:
+    - RABBITMQ_DEFAULT_USER=myuser
+    - RABBITMQ_DEFAULT_PASS=mypassword
+  demo:
+    container_name: demo
+    build: ./demo
+    environment:
+    - RABBITMQ_DEFAULT_USER=myuser
+    - RABBITMQ_DEFAULT_PASS=mypassword
+    - MODULE_NAME=demo
+    - MODULE_INDEX=1
+    - DUNI_ID=appolo13
+    depends_on:
+          - "exchange"    
