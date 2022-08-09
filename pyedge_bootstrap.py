@@ -44,6 +44,9 @@ class PyeBootstrap:
             }))
         self.connection.process_data_events(time_limit=None)
         return self.response.decode()
+    def close(self):
+        if self.connection:
+             self.connection.close()
 
 
 parser=argparse.ArgumentParser()
@@ -61,4 +64,4 @@ bootstrap = PyeBootstrap(args.host,args.port,args.user,args.password)
 print(" try to get initial config")
 response = bootstrap.get_config(args.duniid)
 print(" [.] Got %s" % response)
-
+bootstrap.close()
