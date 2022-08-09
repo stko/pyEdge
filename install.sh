@@ -11,7 +11,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 #  do 'export DEBUG=YES' first, if the finished image shall not become read-only. This is good for debugging, but bad for daily use..
 #
 # start the install script with
-#    curl -s https://raw.githubusercontent.com/stko/piInfoDisplay/master/install.sh && bash install.sh
+#    curl -s https://raw.githubusercontent.com/stko/pyEdge/master/install.sh -o install.sh && bash install.sh
 
 PROGNAME=pyEdge
 
@@ -24,7 +24,7 @@ python3-venv \
 docker.io docker-compose 
 
 
-# add user to docker user group 
+# add user to docker user group - need to re-login to activate
 sudo usermod -aG docker $USER
 
 # we install usbmount seperately as this causes an error msgs on unbuntu server test env
@@ -64,11 +64,16 @@ mqpassword="${mqpassword:=mypassword}"
 echo SCRIPT_DIR $SCRIPT_DIR
 cd $SCRIPT_DIR
 cd  $PROGNAME
+
 python3 -m venv .venv
 source .venv/bin/activate
 pwd
 ls -a
 python -m pip install  -r requirements.txt
+
+
+# set the executable flag
+chmod a+x *.sh
 
 # setting up the systemd services
 # very helpful source : http://patrakov.blogspot.de/2011/01/writing-systemd-service-files.html
@@ -83,7 +88,8 @@ BindsTo=docker.service
 ReloadPropagatedFrom=docker.service
 
 [Service]
-ExecStart=$SCRIPT_DIR/$PROGNAME/$PROGNAME.sh --host $mqhost --port $mqport --user $mquser --password $mqpassword
+WorkingDirectory=$SCRIPT_DIR/$PROGNAME
+ExecStart=$SCRIPT_DIR/$PROGNAME/.venv/bin/python pyedge_bootstrap.py --host $mqhost --port $mqport --user $mquser --password $mqpassword
 Restart=on-failure
 
 [Install]
