@@ -64,6 +64,7 @@ mqpassword="${mqpassword:=mypassword}"
 echo SCRIPT_DIR $SCRIPT_DIR
 cd $SCRIPT_DIR
 cd  $PROGNAME
+cd client
 
 python3 -m venv .venv
 source .venv/bin/activate
@@ -88,8 +89,8 @@ BindsTo=docker.service
 ReloadPropagatedFrom=docker.service
 
 [Service]
-WorkingDirectory=$SCRIPT_DIR/$PROGNAME
-ExecStart=$SCRIPT_DIR/$PROGNAME/.venv/bin/python pyedge_bootstrap.py --host $mqhost --port $mqport --user $mquser --password $mqpassword
+WorkingDirectory=$SCRIPT_DIR/$PROGNAME/client
+ExecStart=$SCRIPT_DIR/$PROGNAME/client/.venv/bin/python pyedge_bootstrap.py --host $mqhost --port $mqport --user $mquser --password $mqpassword
 Restart=on-failure
 
 [Install]
