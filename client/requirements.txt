@@ -1,0 +1,3 @@
+python-on-whales
+pika
+pyyaml

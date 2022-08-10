@@ -27,17 +27,6 @@ def on_request(ch, method, props, body):
             "docker-compose":'''
 version: "3.9"
 services:
-  parent_company_rabbitmq:
-    container_name: "rabbitmq"
-    image: rabbitmq:management
-    ports:
-      # HTTP management UI
-      - '8080:15672'
-      # AMQP protocol port
-      - '5673:5672'
-    environment:
-    - RABBITMQ_DEFAULT_USER=myuser
-    - RABBITMQ_DEFAULT_PASS=mypassword
   exchange:
     container_name: "exchange"
     # image: rabbitmq-management-with-federation
@@ -60,9 +49,6 @@ services:
     environment:
     - RABBITMQ_DEFAULT_USER=myuser
     - RABBITMQ_DEFAULT_PASS=mypassword
-    - MODULE_NAME=demo
-    - MODULE_INDEX=1
-    - DUNI_ID=appolo13
     depends_on:
     - "exchange"
         '''}
@@ -71,7 +57,7 @@ services:
                         routing_key=props.reply_to,
                         properties=pika.BasicProperties(correlation_id = \
                                                             props.correlation_id),
-                        body=str(response))
+                        body=json.dumps(response))
         ch.basic_ack(delivery_tag=method.delivery_tag)
     except Exception as ex:
         print(str(ex))
