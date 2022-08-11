@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 import pika
 import uuid
-import os
+import os, sys
 
 
 class FibonacciRpcClient(object):
 
     def __init__(self):
         self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host='localhost',  credentials=pika.PlainCredentials(os.getenv("RABBITMQ_DEFAULT_USER"), os.getenv("RABBITMQ_DEFAULT_PASS"))))
+            pika.ConnectionParameters(host=sys.argv[1],  credentials=pika.PlainCredentials(os.getenv("RABBITMQ_DEFAULT_USER"), os.getenv("RABBITMQ_DEFAULT_PASS"))))
 
         self.channel = self.connection.channel()
 

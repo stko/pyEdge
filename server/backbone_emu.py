@@ -37,7 +37,7 @@ services:
     #  dockerfile: ./Dockerfile
     ports:
       # HTTP management UI
-      - '8081:15672'
+      - '8080:15672'
       # AMQP protocol port
       - '5672:5672'
     environment:
