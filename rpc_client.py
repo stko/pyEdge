@@ -1,14 +1,27 @@
 #!/usr/bin/env python
+
+import os, sys
 import pika
 import uuid
-import os, sys
+import json
+from pyedge import PyEdge
 
 
 class FibonacciRpcClient(object):
 
     def __init__(self):
+        user =os.getenv("RABBITMQ_DEFAULT_USER") or "myuser"
+        password= os.getenv("RABBITMQ_DEFAULT_PASS") or "mypassword"
+        # helpful for debugging to set another exchange
+        host = sys.argv[1]
+        pe=PyEdge(
+            "rpcclient.1",
+            host=host,
+            user=user,
+            password=password
+        )
         self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=sys.argv[1],  credentials=pika.PlainCredentials(os.getenv("RABBITMQ_DEFAULT_USER"), os.getenv("RABBITMQ_DEFAULT_PASS"))))
+            pika.ConnectionParameters(host=host,  credentials=pika.PlainCredentials(user, password)))
 
         self.channel = self.connection.channel()
 
@@ -37,14 +50,15 @@ class FibonacciRpcClient(object):
                 reply_to=self.callback_queue,
                 correlation_id=self.corr_id,
             ),
-            body=str(n))
+            body=json.dumps({"type":"egal","rpc":True,"data":str(n)})
+        )
         self.connection.process_data_events(time_limit=None)
         return int(self.response)
 
 
 fibonacci_rpc = FibonacciRpcClient()
 
-print(" [x] Requesting fib(30)")
-response = fibonacci_rpc.call(30)
+print(" [x] Requesting fib(5)")
+response = fibonacci_rpc.call(5)
 print(" [.] Got %r" % response)
 
