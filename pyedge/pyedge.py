@@ -5,7 +5,7 @@ import sys
 import pika
 import time
 import json
-
+import uuid
 
 class PyEdgeConnectException(Exception):
     pass
@@ -35,6 +35,7 @@ class PyEdge:
         self.nr_of_trials = nr_of_trials
         self.wait_delay = wait_delay
         self.handlers = {}
+        self.responses={}
         if not host in self.connections:  # do we have already connected to that host before?
             connection = None
             while connection == None and nr_of_trials > 0:
@@ -104,23 +105,64 @@ class PyEdge:
                 wait_delay=self.wait_delay
         self._send_message(duni, module, {"type": type, "data": data},port=port,user=user,password=password,nr_of_trials=nr_of_trials,wait_delay=wait_delay)
 
-    '''def request(self, duni, module, type, data, handler):
-        self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=host,  credentials=pika.PlainCredentials(user, password)))
+    def request(self, module, type, data, 
+              host=None,
+              port=None,
+              user=None,
+              password=None,
+              nr_of_trials=None,
+              wait_delay=None
+              ):
+        if not host:
+            host=self.host
+        if not port:
+            port=self.port
+        if not user:
+                user=self.user
+        if not password:
+                password=self.password
+        if not nr_of_trials:
+                nr_of_trials=self.nr_of_trials
+        if not wait_delay:
+                wait_delay=self.wait_delay
+        connection, channel = self.get_connection(
+            host, port, user, password, nr_of_trials, wait_delay)
+        channel=connection.channel() # create a temporary channel
 
-        self.channel = self.connection.channel()
+        result = channel.queue_declare(queue='', exclusive=True)
+        callback_queue = result.method.queue
 
-        result = self.channel.queue_declare(queue='', exclusive=True)
-        self.callback_queue = result.method.queue
-
-        self.channel.basic_consume(
-            queue=self.callback_queue,
+        channel.basic_consume(
+            queue=callback_queue,
             on_message_callback=self.on_response,
             auto_ack=True)
 
-        self.response = None
-        self.corr_id = None
-    '''
+        corr_id = str(uuid.uuid4())
+        channel.basic_publish(
+            exchange="",
+            routing_key=module,
+            properties=pika.BasicProperties(
+                reply_to=callback_queue,
+                correlation_id=corr_id,
+            ),
+            body=json.dumps({"type":type,"rpc":True,"data":data})
+        )
+        self.responses[corr_id]=""
+        connection.process_data_events(time_limit=None)
+        result="Nöö"
+        if corr_id in self.responses:
+            result=self.responses[corr_id]
+            del self.responses[corr_id]
+        return result
+
+
+    
+    def on_response(self, ch, method, props, body):
+        corr_id=props.correlation_id
+        if corr_id in self.responses:
+            self.responses[corr_id]=body
+
+
 
     def _send_message(self, exchange, module, message,host, port, user, password, nr_of_trials, wait_delay):
         connection, channel = self.get_connection(
