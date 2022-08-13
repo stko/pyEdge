@@ -1,0 +1,5 @@
+include README.rst
+include LICENSE*
+include pysotp/libcanwrap.so
+include pysotp/can_wrap_src/*
+include pysotp/can_wrap_src/linux/can/*

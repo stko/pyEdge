@@ -5,16 +5,7 @@ import pika
 import time
 from pyedge import PyEdge
 
-'''
-try:
-    from pyedge import PyEdge
-except:
-    ScriptPath = os.path.realpath(os.path.join(
-        os.path.dirname(__file__), "../.."))
-    # Add the directory containing your module to the Python path (wants absolute paths)
-    sys.path.append(os.path.abspath(ScriptPath))
-    from pyedge import PyEdge
-'''
+
 
 def fib(n):
     n=int(n)
@@ -36,7 +27,7 @@ password= os.getenv("RABBITMQ_DEFAULT_PASS") or "mypassword"
 host = os.getenv("DUNI_HOST") or 'exchange'
 pe = PyEdge(
     module_queue,
-    host=host,
+    host="localhost",
     user=user,
     password=password,
 )

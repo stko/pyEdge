@@ -27,6 +27,10 @@ def on_request(ch, method, props, body):
             "docker-compose":'''
 version: "3.9"
 services:
+  pythonbuilder:
+    container_name: "pythonbuilder"
+    image: "pythonbuilder"
+    build: ./pythonbuilder
   exchange:
     container_name: "exchange"
     # image: rabbitmq-management-with-federation
@@ -49,8 +53,11 @@ services:
     environment:
     - RABBITMQ_DEFAULT_USER=myuser
     - RABBITMQ_DEFAULT_PASS=mypassword
+    - DUNI_HOST=192.168.1.116
+ 
     depends_on:
     - "exchange"
+    - "pythonbuilder"
         '''}
 
         ch.basic_publish(exchange='',
