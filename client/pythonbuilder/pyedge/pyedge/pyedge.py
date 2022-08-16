@@ -24,7 +24,8 @@ class PyEdge:
                  user="guest",
                  password="guest",
                  nr_of_trials=30,
-                 wait_delay=1
+                 wait_delay=1,
+                 purge=False
 
                  ) -> None:
         self.module_queue = module_queue
@@ -45,7 +46,7 @@ class PyEdge:
                         pika.ConnectionParameters(host=host, port=port,  credentials=pika.PlainCredentials(user, password)))
                 except Exception as ex:
                     print("catched connect exception", str(ex))
-                    if nr_of_trials < 1:
+                    if nr_of_trials < 2:
                         raise PyEdgeConnectException
                     time.sleep(wait_delay)
                 nr_of_trials -= 1
@@ -55,6 +56,9 @@ class PyEdge:
 
         channel.queue_declare(queue=module_queue)  # receiving queue
         channel.queue_declare("exchange")  # exchange communication
+        if purge:
+            channel.queue_purge(queue=module_queue)
+            channel.queue_purge("exchange")
         channel.basic_qos(prefetch_count=1)
         channel.basic_consume(queue=module_queue,
                               on_message_callback=self.message_handler)
@@ -205,3 +209,10 @@ class PyEdge:
                 ch.basic_ack(delivery_tag=method.delivery_tag)
         except Exception as ex:
             print("malformed message structure received:", body, str(ex))
+            if "rpc" in message and message["rpc"]:
+                ch.basic_publish(exchange='',
+                                 routing_key=props.reply_to,
+                                 properties=pika.BasicProperties(
+                                     correlation_id=props.correlation_id),
+                                 body=json.dumps({"type":"error"}))
+                ch.basic_ack(delivery_tag=method.delivery_tag)
