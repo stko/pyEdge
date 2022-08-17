@@ -1,1 +1,3 @@
 pika
+python-can
+can-isotp

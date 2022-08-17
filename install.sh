@@ -37,7 +37,6 @@ curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-comp
 chmod +x ~/.docker/cli-plugins/docker-compose
 
 # and do the same because the pyEdge- Service runs as root, so also root need this extension
-sudo cp ~
 # create the docker plugins directory if it doesn't exist yet
 sudo mkdir -p /root/.docker/cli-plugins
 sudo cp ~/.docker/cli-plugins/docker-compose /root/.docker/cli-plugins

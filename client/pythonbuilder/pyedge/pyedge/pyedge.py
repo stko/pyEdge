@@ -87,6 +87,15 @@ class PyEdge:
                 "connection": connection, "channel": channel}
         return self.connections[host]["connection"], self.connections[host]["channel"]
 
+    def close(self,host=None):
+        for actual_host in self.connections:
+            if host == None or host == actual_host:
+                self.connections[actual_host]["connection"].close()
+        if host == None: #remove all
+            self.connections={}
+        else:
+            del self.connections[host]
+
     def send_status(self):
         self.event("", 'exchange', {"module": self.module_queue})
 
