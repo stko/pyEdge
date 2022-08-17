@@ -53,7 +53,18 @@ services:
     environment:
     - RABBITMQ_DEFAULT_USER=myuser
     - RABBITMQ_DEFAULT_PASS=mypassword
-    - DUNI_HOST=192.168.1.116
+    #- DUNI_HOST=192.168.1.116
+ 
+    depends_on:
+    - "exchange"
+    - "pythonbuilder"
+  can_demo:
+    container_name: can_demo
+    build: ./can_demo
+    environment:
+    - RABBITMQ_DEFAULT_USER=myuser
+    - RABBITMQ_DEFAULT_PASS=mypassword
+    #- DUNI_HOST=192.168.1.116
  
     depends_on:
     - "exchange"
