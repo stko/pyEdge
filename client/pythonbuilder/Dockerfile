@@ -5,6 +5,5 @@ RUN apt-get update && apt-get install build-essential clang -y
 COPY . .
 # install the modules as --user option allow a later copy
 RUN python -m venv .venv
-RUN .venv/bin/python -m pip install ./pysotp
 RUN .venv/bin/python -m pip install ./pyedge
 RUN .venv/bin/python -m pip install -r requirements.txt
