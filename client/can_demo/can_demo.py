@@ -12,9 +12,9 @@ def can_message(isotp_request):
 	s.set_fc_opts(stmin=5, bs=10)
 	# s.set_general_opts(...)
 	# s.set_ll_opts(...)
-	s.bind("vcan0", isotp.Address(
+	s.bind("vxcan0", isotp.Address(
 		rxid=isotp_request["rxid"], txid=isotp_request["txid"]))
-	s2.bind("vcan0", isotp.Address(
+	s2.bind("vxcan0", isotp.Address(
 		rxid=isotp_request["txid"], txid=isotp_request["rxid"]))
 	s2.send(b"Hello, this is a long payload sent in small chunks of 8 bytes.")
 	answ = s.recv()
