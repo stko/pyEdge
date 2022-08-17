@@ -8,6 +8,10 @@ import time
 def can_message(isotp_request):
 	s = isotp.socket()
 	s2 = isotp.socket()
+	# Configuring the sockets.
+	s.set_fc_opts(stmin=5, bs=10)
+	# s.set_general_opts(...)
+	# s.set_ll_opts(...)
 	s.bind("vcan0", isotp.Address(
 		rxid=isotp_request["rxid"], txid=isotp_request["txid"]))
 	s2.bind("vcan0", isotp.Address(
@@ -21,7 +25,7 @@ def can_message(isotp_request):
 	else:
 		return {"dtl": 0}
 
-
+''' besser nicht direkt beim Start auf den Bus zugreifen, der ist nämlich vielleicht noch gar nicht virtualisert
 bustype = 'socketcan'
 channel = 'vcan0'
 
@@ -35,13 +39,8 @@ def producer(id):
     time.sleep(1)
 
 producer(10)
+'''
 
-s = isotp.socket()
-s2 = isotp.socket()
-# Configuring the sockets.
-s.set_fc_opts(stmin=5, bs=10)
-# s.set_general_opts(...)
-# s.set_ll_opts(...)
 
 module_name = os.getenv("MODULE_NAME") or 'can_demo'
 module_index = os.getenv("MODULE_INDEX") or "1"
