@@ -76,8 +76,10 @@ class PyeBootstrap:
             elements = service.split("_",1)
             service_name=elements[0]
             if len(elements)>1:
-                service_index=elements[0]
+                service_name="_".join(elements[:-1])
+                service_index=elements[-1]
             else:
+                service_name=elements[0]
                 service_index="1"
             this_service["container_name"]=service
             if "environment" not in this_service:
