@@ -223,5 +223,5 @@ class PyEdge:
                                  routing_key=props.reply_to,
                                  properties=pika.BasicProperties(
                                      correlation_id=props.correlation_id),
-                                 body=json.dumps({"type":"error"}))
+                                 body=json.dumps({"type":"exception", "msg":str(ex)}))
                 ch.basic_ack(delivery_tag=method.delivery_tag)
