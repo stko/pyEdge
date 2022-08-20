@@ -27,12 +27,18 @@ docker.io docker-compose
 # add user to docker user group - need to re-login to activate
 sudo usermod -aG docker $USER
 
+# try to identify architecture
+ARCH=$( uname -m )
 
 # add docker compose for docker version < 2.0
 # create the docker plugins directory if it doesn't exist yet
 mkdir -p ~/.docker/cli-plugins
 # download the CLI into the plugins directory
-curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+if [ $ARCH = "x86_64" ] ; then
+	curl -sSL https://github.com/docker/compose/releases/download/v2.10.0/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+else
+	curl -sSL https://github.com/docker/compose/releases/download/v2.10.0/docker-compose-linux-armv7 -o ~/.docker/cli-plugins/docker-compose
+fi
 # make the CLI executable
 chmod +x ~/.docker/cli-plugins/docker-compose
 
@@ -40,6 +46,25 @@ chmod +x ~/.docker/cli-plugins/docker-compose
 # create the docker plugins directory if it doesn't exist yet
 sudo mkdir -p /root/.docker/cli-plugins
 sudo cp ~/.docker/cli-plugins/docker-compose /root/.docker/cli-plugins
+
+
+#add docker buildx support
+# create the docker plugins directory if it doesn't exist yet
+mkdir -p ~/.docker/cli-plugins
+# download the CLI into the plugins directory
+if [ $ARCH = "x86_64" ] ; then
+	curl -sSL https://github.com/docker/buildx/releases/download/v0.9.1/buildx-v0.9.1.linux-amd64 -o ~/.docker/cli-plugins/docker-buildx
+else
+	curl -sSL https://github.com/docker/buildx/releases/download/v0.9.1/buildx-v0.9.1.linux-arm-v7 -o ~/.docker/cli-plugins/docker-buildx
+fi
+
+# make the CLI executable
+chmod +x ~/.docker/cli-plugins/docker-buildx
+
+# and do the same because the pyEdge- Service runs as root, so also root need this extension
+# create the docker plugins directory if it doesn't exist yet
+sudo mkdir -p /root/.docker/cli-plugins
+sudo cp ~/.docker/cli-plugins/docker-buildx /root/.docker/cli-plugins
 
 
 
