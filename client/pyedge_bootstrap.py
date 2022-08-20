@@ -126,4 +126,7 @@ new_cd=bootstrap.calculate_docker_compose(response["docker-compose"])
 bootstrap.write_docker_compose(new_cd)
 bootstrap.close()
 # let's dance
+# first make the base module
+docker.build("./pythonbuilder",tags=["pythonbuilder"])
+#and then do the rest
 docker.compose.up()
