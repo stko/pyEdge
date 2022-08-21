@@ -73,10 +73,10 @@ sudo apt-get install --assume-yes \
 usbmount 
 
 if [[DEBUG -eq YES]] ; then
-	git clone https://github.com/stko/$PROGNAME
+	git clone https://github.com/stko/$PROGNAME.git
 else
-	wget  https://github.com/stko/$PROGNAME/archive/master.zip -O $PROGNAME.zip && unzip $PROGNAME.zip
-	mv $PROGNAME-master $PROGNAME
+	wget  https://github.com/stko/$PROGNAME/archive/refs/heads/main.zip -O $PROGNAME.zip && unzip $PROGNAME.zip
+	mv $PROGNAME-main $PROGNAME
 fi
 # uncomment in case of special config files
 # sudo mkdir /etc/$PROGNAME
