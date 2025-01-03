@@ -162,10 +162,15 @@ class PyEdge:
         )
         self.responses[corr_id]=""
         connection.process_data_events(time_limit=None)
-        result="Nöö"
+        result=""
         if corr_id in self.responses:
             result=self.responses[corr_id]
             del self.responses[corr_id]
+            try:
+                result=json.loads(result)
+                return result["data"]
+            except: # if we can't parse the result we return the raw data
+                return result
         return result
 
 
@@ -194,7 +199,7 @@ class PyEdge:
             self.handlers = {}  # if msg_type is None or "", clear all handlers
         if msg_type == None:
             return  # nothing else to do
-        if msg_type != "":
+        if msg_type != "" and "" in self.handlers:
             # if we have a named type, then we can't use the unique handler anymore, so we remove him
             del self.handlers[""]
         self.handlers[msg_type] = handler  # store the handler
@@ -214,7 +219,7 @@ class PyEdge:
                                  routing_key=props.reply_to,
                                  properties=pika.BasicProperties(
                                      correlation_id=props.correlation_id),
-                                 body=json.dumps(result))
+                                 body=json.dumps({"type":msg_type, "data":result}))
                 ch.basic_ack(delivery_tag=method.delivery_tag)
         except Exception as ex:
             print("malformed message structure received:", body, str(ex))
